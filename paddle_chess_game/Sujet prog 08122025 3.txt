@@ -1,0 +1,53 @@
+# Sujet prog 08/12/2025 
+
+**Nouveau sujet (jeux d’echecs miova kely)**
+
+Par principe misy carreaux sy pion 
+Le Roi, la reine…
+Mitovy am normal
+Tapitra ny partie refa echecs ny Roi
+
+A faire : jeux d’echecs combiner avec ping pong
+
+Petite ball qui va piou piou, refa mavoadona pion ray dia mihena ny vie
+Donc pion misy vie —> -1 ny vie isakiny voadona ny ball
+
+Raha 1 ny vie de depart dia tode maty raha voadona
+Vie de pion mety != 
+Configurable
+
+Misy rackette afaka ahetsiketsika sur front ny joueur
+
+Mi rebondir ny baolina
+
+En reseaux ny jeux 
+Si le pion meurt, il peut rebondir sur la case du pion mort
+(cote anle case zany)
+
+Nombre de pion configurable
+
+raha 8 dia tafiditra ny pieces rehetra
+
+Raha 2 zany dia 2 pion + roi et reine
+4 -> tafiditra ny fou sur le cote
+6 -> cavalier
+8 -> tour
+
+pion mitovy vie daoly
+fa ny pieces no mety samihafa
+
+Language : dotnet, swing na fx, windform (c#), python tkinter, C sdl
+Oriente objet nefa dia swing na fx na windform zan
+
+Ilay en reseaux tokony hita amle joueur ray
+2 appli : 1 serveur , 1 client
+serveur configurer ny rehetra
+ny logique metier sns
+
+client maka position baolina en temps reel 
+Mandefa any am serveur zanny hoe nihetsika sns
+Mandray en meme temps ny information ny serveur
+Individuel
+
+rackette controller joueur
+misafidy angle hoe alefa aiza ilay baolina au debut![](image.jpg)
