@@ -2,12 +2,13 @@
 
 # Board dimensions
 BOARD_COLS = 8  # Number of columns (files)
-BOARD_ROWS = 14  # Number of rows (ranks) - reduced to fit screen
+BOARD_ROWS = 13  # Number of rows (ranks) - reduced to fit navbar
+NAVBAR_HEIGHT = 60
 
 # Screen dimensions - calculated to have perfect squares with no margins
 CELL_SIZE = 70  # Size of each square cell in pixels (adjust this to change overall size)
 SCREEN_WIDTH = BOARD_COLS * CELL_SIZE  # 8 * 60 = 480
-SCREEN_HEIGHT = BOARD_ROWS * CELL_SIZE  # 14 * 60 = 840
+SCREEN_HEIGHT = BOARD_ROWS * CELL_SIZE + NAVBAR_HEIGHT
 FPS = 60
 
 # Colors
@@ -30,6 +31,7 @@ PADDLE_SPEED = 7
 BALL_RADIUS = 10
 BALL_SPEED_X = 3
 BALL_SPEED_Y = 2
+BALL_DAMAGE = 1
 
 # Chess Pieces lives by type
 CHESS_PIECES_LIVES = {
@@ -39,6 +41,16 @@ CHESS_PIECES_LIVES = {
     "tour": 2,
     "chevalier": 2,
     "pion": 1,
+}
+
+# Score values
+PIECE_VALUES = {
+    "pion": 10,
+    "chevalier": 30,
+    "fou": 30,
+    "tour": 30,
+    "reine": 50,
+    "roi": 100
 }
 
 # Chess pieces geometry

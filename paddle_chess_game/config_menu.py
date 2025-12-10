@@ -15,38 +15,66 @@ class ConfigMenu:
         
         # Configuration values (default from settings)
         self.config = {
-            'ball_speed': max(settings.BALL_SPEED_X, settings.BALL_SPEED_Y),  # Use the higher speed as default
-            'board_width': settings.BOARD_COLS,  # Number of active columns (2, 4, 6, or 8)
-            'starting_player': 1,  # Player 1 starts by default
+            'ball_speed': max(settings.BALL_SPEED_X, settings.BALL_SPEED_Y),
+            'ball_damage': settings.BALL_DAMAGE,
+            'board_width': settings.BOARD_COLS,
+            'starting_player': 1,
+            # Lives
             'roi_lives': settings.CHESS_PIECES_LIVES['roi'],
             'reine_lives': settings.CHESS_PIECES_LIVES['reine'],
             'fou_lives': settings.CHESS_PIECES_LIVES['fou'],
             'tour_lives': settings.CHESS_PIECES_LIVES['tour'],
             'chevalier_lives': settings.CHESS_PIECES_LIVES['chevalier'],
             'pion_lives': settings.CHESS_PIECES_LIVES['pion'],
+            # Points
+            'roi_points': settings.PIECE_VALUES['roi'],
+            'reine_points': settings.PIECE_VALUES['reine'],
+            'fou_points': settings.PIECE_VALUES['fou'],
+            'tour_points': settings.PIECE_VALUES['tour'],
+            'chevalier_points': settings.PIECE_VALUES['chevalier'],
+            'pion_points': settings.PIECE_VALUES['pion'],
         }
         
         # Track which field is selected
         self.selected_field = None
         self.input_text = ""
         
-        # Define input fields with positions
+        # Define input fields with positions (x, y)
+        # Global settings
         self.fields = {
-            'ball_speed': {'label': 'Vitesse balle', 'y': 150, 'min': 1, 'max': 20},
-            'board_width': {'label': 'Largeur echiquier', 'y': 200, 'min': 2, 'max': 8, 'step': 2},  # Only even numbers
-            'starting_player': {'label': 'Joueur debutant (1/2)', 'y': 250, 'min': 1, 'max': 2},
-            'roi_lives': {'label': 'Vies Roi', 'y': 300, 'min': 1, 'max': 10},
-            'reine_lives': {'label': 'Vies Reine', 'y': 350, 'min': 1, 'max': 10},
-            'fou_lives': {'label': 'Vies Fou', 'y': 400, 'min': 1, 'max': 10},
-            'tour_lives': {'label': 'Vies Tour', 'y': 450, 'min': 1, 'max': 10},
-            'chevalier_lives': {'label': 'Vies Chevalier', 'y': 500, 'min': 1, 'max': 10},
-            'pion_lives': {'label': 'Vies Pion', 'y': 550, 'min': 1, 'max': 10},
+            'ball_speed': {'label': 'Vitesse balle', 'x': 50, 'y': 120, 'min': 1, 'max': 20},
+            'ball_damage': {'label': 'Degats balle', 'x': 50, 'y': 160, 'min': 1, 'max': 10},
+            'board_width': {'label': 'Largeur echiquier', 'x': 50, 'y': 200, 'min': 2, 'max': 8, 'step': 2},
+            'starting_player': {'label': 'Joueur debutant', 'x': 50, 'y': 240, 'min': 1, 'max': 2},
         }
+        
+        # Lives (Left Column)
+        y_start = 300
+        step = 40
+        self.fields.update({
+            'roi_lives': {'label': 'Vies Roi', 'x': 50, 'y': y_start, 'min': 1, 'max': 10},
+            'reine_lives': {'label': 'Vies Reine', 'x': 50, 'y': y_start + step, 'min': 1, 'max': 10},
+            'fou_lives': {'label': 'Vies Fou', 'x': 50, 'y': y_start + step*2, 'min': 1, 'max': 10},
+            'tour_lives': {'label': 'Vies Tour', 'x': 50, 'y': y_start + step*3, 'min': 1, 'max': 10},
+            'chevalier_lives': {'label': 'Vies Chevalier', 'x': 50, 'y': y_start + step*4, 'min': 1, 'max': 10},
+            'pion_lives': {'label': 'Vies Pion', 'x': 50, 'y': y_start + step*5, 'min': 1, 'max': 10},
+        })
+
+        # Points (Right Column)
+        x_col2 = settings.SCREEN_WIDTH // 2 + 20
+        self.fields.update({
+            'roi_points': {'label': 'Points Roi', 'x': x_col2, 'y': y_start, 'min': 0, 'max': 1000},
+            'reine_points': {'label': 'Points Reine', 'x': x_col2, 'y': y_start + step, 'min': 0, 'max': 1000},
+            'fou_points': {'label': 'Points Fou', 'x': x_col2, 'y': y_start + step*2, 'min': 0, 'max': 1000},
+            'tour_points': {'label': 'Points Tour', 'x': x_col2, 'y': y_start + step*3, 'min': 0, 'max': 1000},
+            'chevalier_points': {'label': 'Points Chevalier', 'x': x_col2, 'y': y_start + step*4, 'min': 0, 'max': 1000},
+            'pion_points': {'label': 'Points Pion', 'x': x_col2, 'y': y_start + step*5, 'min': 0, 'max': 1000},
+        })
         
         # Start button
         self.start_button_rect = pygame.Rect(
             settings.SCREEN_WIDTH // 2 - 100,
-            settings.SCREEN_HEIGHT - 100,
+            settings.SCREEN_HEIGHT - 80,
             200,
             50
         )
@@ -92,7 +120,9 @@ class ConfigMenu:
             # Check if any field clicked
             self.selected_field = None
             for field_name, field_info in self.fields.items():
-                field_rect = pygame.Rect(350, field_info['y'] - 5, 80, 30)
+                # Box is at x + 180 (approx)
+                box_x = field_info['x'] + 180
+                field_rect = pygame.Rect(box_x, field_info['y'] - 5, 60, 30)
                 if field_rect.collidepoint(mouse_pos):
                     self.selected_field = field_name
                     self.input_text = str(self.config[field_name])
@@ -118,15 +148,16 @@ class ConfigMenu:
         
         # Title
         title = self.title_font.render("Configuration du Jeu", True, settings.BLACK)
-        self.screen.blit(title, title.get_rect(center=(settings.SCREEN_WIDTH // 2, 60)))
+        self.screen.blit(title, title.get_rect(center=(settings.SCREEN_WIDTH // 2, 50)))
         
         # Draw fields
         for field_name, field_info in self.fields.items():
+            x = field_info['x']
             y = field_info['y']
             
             # Label
-            label = self.font.render(field_info['label'] + ":", True, settings.BLACK)
-            self.screen.blit(label, (100, y))
+            label = self.small_font.render(field_info['label'] + ":", True, settings.BLACK)
+            self.screen.blit(label, (x, y))
             
             # Value box
             value_text = str(self.config[field_name])
@@ -137,21 +168,16 @@ class ConfigMenu:
                 color = settings.GREY
             
             # Draw box
-            box_rect = pygame.Rect(350, y - 5, 80, 30)
+            box_x = x + 180
+            box_rect = pygame.Rect(box_x, y - 5, 60, 30)
             pygame.draw.rect(self.screen, color, box_rect, 2)
             
             # Draw value
             value_surface = self.font.render(value_text, True, settings.BLACK)
-            self.screen.blit(value_surface, (360, y))
+            # Center text in box
+            text_rect = value_surface.get_rect(center=box_rect.center)
+            self.screen.blit(value_surface, text_rect)
             
-            # Draw range hint
-            hint = self.small_font.render(
-                f"({field_info['min']}-{field_info['max']})",
-                True,
-                settings.GREY
-            )
-            self.screen.blit(hint, (450, y + 5))
-        
         # Start button
         button_color = settings.GREEN if self.start_button_rect.collidepoint(pygame.mouse.get_pos()) else settings.BLUE
         pygame.draw.rect(self.screen, button_color, self.start_button_rect)
@@ -160,14 +186,6 @@ class ConfigMenu:
         start_text = self.font.render("COMMENCER", True, settings.WHITE)
         text_rect = start_text.get_rect(center=self.start_button_rect.center)
         self.screen.blit(start_text, text_rect)
-        
-        # Instructions
-        instructions = self.small_font.render(
-            "Cliquez sur une valeur pour la modifier | ESC pour quitter",
-            True,
-            settings.GREY
-        )
-        self.screen.blit(instructions, instructions.get_rect(center=(settings.SCREEN_WIDTH // 2, 600)))
         
         pygame.display.flip()
     

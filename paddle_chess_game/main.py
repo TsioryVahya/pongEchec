@@ -96,6 +96,9 @@ def run_host_game(screen, clock, port):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r and game.game_over:
+                    game.reset_game()
         
         # Host Logic:
         # 1. Get Remote Input (Player 2)
@@ -111,6 +114,15 @@ def run_host_game(screen, clock, port):
             game.top_paddle.move(left=True, bounds=game.paddle_bounds)
         if keys[pygame.K_RIGHT]:
             game.top_paddle.move(left=False, bounds=game.paddle_bounds)
+            
+        # Aiming for Host (P1)
+        if game.is_serving and game.serving_player == 1:
+            aim_speed = 2.0
+            if keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_z]:
+                 game.serve_angle = max(-45, game.serve_angle - aim_speed)
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                 game.serve_angle = min(45, game.serve_angle + aim_speed)
+
         if keys[pygame.K_SPACE] and game.is_serving and game.serving_player == 1:
             game._serve_ball()
             
@@ -187,6 +199,8 @@ def run_client_game(screen, clock, ip, port):
         inputs = {
             'left': keys[pygame.K_LEFT],
             'right': keys[pygame.K_RIGHT],
+            'up': keys[pygame.K_UP],
+            'down': keys[pygame.K_DOWN],
             'space': keys[pygame.K_SPACE]
         }
         client.send_input(inputs)

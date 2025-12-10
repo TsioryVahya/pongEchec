@@ -85,6 +85,7 @@ class Game:
         ball_speed = config.get('ball_speed', max(settings.BALL_SPEED_X, settings.BALL_SPEED_Y))
         settings.BALL_SPEED_X = ball_speed
         settings.BALL_SPEED_Y = ball_speed
+        settings.BALL_DAMAGE = config.get('ball_damage', settings.BALL_DAMAGE)
         
         # Apply board width (must be even: 2, 4, 6, or 8)
         board_width = config.get('board_width', settings.BOARD_COLS)
@@ -96,6 +97,15 @@ class Game:
         self.starting_player = config.get('starting_player', 1)
         self.serving_player = self.starting_player
         
+        # Service aiming
+        self.serve_angle = 0.0 # Degrees, 0 is vertical
+        self.serve_angle_direction = 1 # 1 (right) or -1 (left)
+        self.serve_angle_speed = 2.0 # Degrees per frame
+        
+        # Scores
+        self.score_p1 = 0
+        self.score_p2 = 0
+        
         # Apply piece lives
         settings.CHESS_PIECES_LIVES['roi'] = config.get('roi_lives', settings.CHESS_PIECES_LIVES['roi'])
         settings.CHESS_PIECES_LIVES['reine'] = config.get('reine_lives', settings.CHESS_PIECES_LIVES['reine'])
@@ -104,6 +114,14 @@ class Game:
         settings.CHESS_PIECES_LIVES['chevalier'] = config.get('chevalier_lives', settings.CHESS_PIECES_LIVES['chevalier'])
         settings.CHESS_PIECES_LIVES['pion'] = config.get('pion_lives', settings.CHESS_PIECES_LIVES['pion'])
 
+        # Apply piece points
+        settings.PIECE_VALUES['roi'] = config.get('roi_points', settings.PIECE_VALUES['roi'])
+        settings.PIECE_VALUES['reine'] = config.get('reine_points', settings.PIECE_VALUES['reine'])
+        settings.PIECE_VALUES['fou'] = config.get('fou_points', settings.PIECE_VALUES['fou'])
+        settings.PIECE_VALUES['tour'] = config.get('tour_points', settings.PIECE_VALUES['tour'])
+        settings.PIECE_VALUES['chevalier'] = config.get('chevalier_points', settings.PIECE_VALUES['chevalier'])
+        settings.PIECE_VALUES['pion'] = config.get('pion_points', settings.PIECE_VALUES['pion'])
+
     def _setup_pieces(self):
         # Deprecated: kept for backward compatibility; Board now manages pieces
         self.board = Board()
@@ -111,13 +129,7 @@ class Game:
     def reset_round(self, direction: int):
         # Instead of launching immediately, go to serving state
         self.is_serving = True
-        # If direction is 1 (down), it means player 1 scored or it's P1 turn? 
-        # Actually, usually winner serves, or loser serves. Let's say loser serves.
-        # If direction was 1 (ball going down), it means P1 launched it?
-        # Let's simplify: reset_round is called when ball goes out (but ball doesn't go out anymore).
-        # It's only called at start.
-        # But wait, ball bounces off edges now. So reset_round is only for game start?
-        # Yes, ball stays in play.
+        self.serve_angle = 0.0
         pass
 
     def handle_input(self):
@@ -133,6 +145,36 @@ class Game:
         if keys[pygame.K_RIGHT]:
             self.bottom_paddle.move(left=False, bounds=self.paddle_bounds)
             
+        # Handle serving aiming
+        if self.is_serving:
+            aim_speed = 2.0
+            
+            # Player 1 Aiming (W/S)
+            if self.serving_player == 1:
+                if keys[pygame.K_w]: # Aim Left (relative to shooting down) -> actually angle negative
+                    self.serve_angle = max(-45, self.serve_angle - aim_speed)
+                if keys[pygame.K_s]: # Aim Right -> angle positive
+                    self.serve_angle = min(45, self.serve_angle + aim_speed)
+                # Also allow Up/Down if Host uses arrows
+                if keys[pygame.K_UP]:
+                     self.serve_angle = max(-45, self.serve_angle - aim_speed)
+                if keys[pygame.K_DOWN]:
+                     self.serve_angle = min(45, self.serve_angle + aim_speed)
+
+            # Player 2 Aiming (Up/Down)
+            elif self.serving_player == 2:
+                if keys[pygame.K_UP]: # Aim Left (relative to shooting up) -> angle positive?
+                    # Shooting up: positive angle is Right. 
+                    # Let's say UP increases angle (Right), DOWN decreases (Left)
+                    # Or visually: UP tilts arrow up/right?
+                    # Let's keep it consistent: 
+                    # Angle > 0 is Right. Angle < 0 is Left.
+                    # UP key -> Tilt Left? DOWN key -> Tilt Right?
+                    # Let's try: UP -> Left (-), DOWN -> Right (+)
+                    self.serve_angle = max(-45, self.serve_angle - aim_speed)
+                if keys[pygame.K_DOWN]:
+                    self.serve_angle = min(45, self.serve_angle + aim_speed)
+
         # Handle serving (launch ball)
         if self.is_serving and keys[pygame.K_SPACE]:
             # In local game, anyone can serve if it's their turn
@@ -147,12 +189,22 @@ class Game:
         if not input_data:
             return
             
+        aim_speed = 2.0
+        
         if player_id == 1:
             # Remote is Player 1 (Top)
             if input_data.get('left'):
                 self.top_paddle.move(left=True, bounds=self.paddle_bounds)
             if input_data.get('right'):
                 self.top_paddle.move(left=False, bounds=self.paddle_bounds)
+            
+            # Aiming
+            if self.is_serving and self.serving_player == 1:
+                if input_data.get('up'): # Aim Left
+                    self.serve_angle = max(-45, self.serve_angle - aim_speed)
+                if input_data.get('down'): # Aim Right
+                    self.serve_angle = min(45, self.serve_angle + aim_speed)
+                    
             if input_data.get('space') and self.is_serving and self.serving_player == 1:
                 self._serve_ball()
         elif player_id == 2:
@@ -161,25 +213,47 @@ class Game:
                 self.bottom_paddle.move(left=True, bounds=self.paddle_bounds)
             if input_data.get('right'):
                 self.bottom_paddle.move(left=False, bounds=self.paddle_bounds)
+                
+            # Aiming
+            if self.is_serving and self.serving_player == 2:
+                if input_data.get('up'): # Aim Left
+                    self.serve_angle = max(-45, self.serve_angle - aim_speed)
+                if input_data.get('down'): # Aim Right
+                    self.serve_angle = min(45, self.serve_angle + aim_speed)
+                    
             if input_data.get('space') and self.is_serving and self.serving_player == 2:
                 self._serve_ball()
 
     def _serve_ball(self):
-        """Launch the ball from serving state."""
+        """Launch the ball from serving state using current aim angle."""
         self.is_serving = False
-        # Set initial velocity towards opponent
+        
+        # Calculate velocity based on angle
+        import math
+        # Angle is in degrees, 0 is vertical. 
+        # Positive angle -> Right, Negative -> Left
+        rad = math.radians(self.serve_angle)
+        
+        # Total speed magnitude
+        speed = max(abs(settings.BALL_SPEED_X), abs(settings.BALL_SPEED_Y))
+        
+        vx = speed * math.sin(rad)
+        vy = speed * math.cos(rad)
+        
         if self.serving_player == 1:
-            self.ball.vy = abs(settings.BALL_SPEED_Y)  # Shoot down
+            self.ball.vy = abs(vy)  # Shoot down
         else:
-            self.ball.vy = -abs(settings.BALL_SPEED_Y)  # Shoot up
-        import random
-        self.ball.vx = random.choice([-1, 1]) * settings.BALL_SPEED_X * 0.5
+            self.ball.vy = -abs(vy)  # Shoot up
+            
+        self.ball.vx = vx
 
     def update(self):
         if self.game_over:
             return
             
         if self.is_serving:
+            # Manual aiming is handled in handle_input
+                
             # Ball sticks to the serving paddle
             if self.serving_player == 1:
                 paddle = self.top_paddle
@@ -200,10 +274,18 @@ class Game:
         self.ball.collide_with_paddle(self.bottom_paddle)
         # Pieces collision
         hit = self.ball.collide_with_pieces(self.board.pieces)
-        if hit and hit.type == "roi" and not hit.is_alive():
-            # Winner is the opposite owner
-            self.winner_side = 1 if hit.owner == 2 else 2
-            self.game_over = True
+        if hit and not hit.is_alive():
+            # Add score to opponent
+            points = settings.PIECE_VALUES.get(hit.type, 0)
+            if hit.owner == 1:
+                self.score_p2 += points
+            else:
+                self.score_p1 += points
+                
+            if hit.type == "roi":
+                # Winner is the opposite owner
+                self.winner_side = 1 if hit.owner == 2 else 2
+                self.game_over = True
 
     def get_game_state(self) -> Dict[str, Any]:
         """Get the current game state as a dictionary (for server to send to client)."""
@@ -226,7 +308,10 @@ class Game:
             'game_over': self.game_over,
             'winner_side': self.winner_side,
             'is_serving': self.is_serving,
-            'serving_player': self.serving_player
+            'serving_player': self.serving_player,
+            'serve_angle': self.serve_angle,
+            'score_p1': self.score_p1,
+            'score_p2': self.score_p2
         }
 
     def set_game_state(self, state: Dict[str, Any]):
@@ -259,18 +344,123 @@ class Game:
         self.winner_side = state['winner_side']
         self.is_serving = state['is_serving']
         self.serving_player = state['serving_player']
+        self.serve_angle = state.get('serve_angle', 0.0)
+        self.score_p1 = state.get('score_p1', 0)
+        self.score_p2 = state.get('score_p2', 0)
+
+    def draw_navbar(self):
+        """Draw the top navigation bar with scores and buttons."""
+        # Background
+        navbar_rect = pygame.Rect(0, 0, settings.SCREEN_WIDTH, settings.NAVBAR_HEIGHT)
+        pygame.draw.rect(self.screen, (240, 240, 240), navbar_rect)
+        pygame.draw.line(self.screen, settings.GREY, (0, settings.NAVBAR_HEIGHT), (settings.SCREEN_WIDTH, settings.NAVBAR_HEIGHT), 2)
+        
+        font = pygame.font.SysFont(None, 24)
+        
+        # Scores
+        p1_text = font.render(f"P1: {self.score_p1}", True, settings.BLUE)
+        self.screen.blit(p1_text, (10, settings.NAVBAR_HEIGHT // 2 - p1_text.get_height() // 2))
+        
+        p2_text = font.render(f"P2: {self.score_p2}", True, settings.RED)
+        self.screen.blit(p2_text, (settings.SCREEN_WIDTH - p2_text.get_width() - 10, settings.NAVBAR_HEIGHT // 2 - p2_text.get_height() // 2))
+        
+        # Buttons
+        button_width = 100
+        button_height = 30
+        center_x = settings.SCREEN_WIDTH // 2
+        
+        # Save Button
+        self.save_btn_rect = pygame.Rect(center_x - button_width - 10, settings.NAVBAR_HEIGHT // 2 - button_height // 2, button_width, button_height)
+        pygame.draw.rect(self.screen, settings.GREEN, self.save_btn_rect, border_radius=5)
+        save_text = font.render("Sauvegarder", True, settings.WHITE)
+        self.screen.blit(save_text, save_text.get_rect(center=self.save_btn_rect.center))
+        
+        # Load Button
+        self.load_btn_rect = pygame.Rect(center_x + 10, settings.NAVBAR_HEIGHT // 2 - button_height // 2, button_width, button_height)
+        pygame.draw.rect(self.screen, settings.YELLOW, self.load_btn_rect, border_radius=5)
+        load_text = font.render("Charger", True, settings.BLACK)
+        self.screen.blit(load_text, load_text.get_rect(center=self.load_btn_rect.center))
 
     def draw_ui(self):
-        # Simple texts
+        # Only draw Game Over overlay here
         if self.game_over:
+            # Draw semi-transparent overlay
+            overlay = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+            overlay.set_alpha(128)
+            overlay.fill(settings.WHITE)
+            self.screen.blit(overlay, (0, 0))
+            
             msg = f"{settings.WIN_TEXT} (Gagnant: Joueur {self.winner_side})"
-            text = self.big_font.render(msg, True, settings.WHITE)
-            hint = self.font.render(settings.RESET_HINT, True, settings.GREY)
-            self.screen.blit(text, text.get_rect(center=(settings.SCREEN_WIDTH//2, 40)))
-            self.screen.blit(hint, hint.get_rect(center=(settings.SCREEN_WIDTH//2, 70)))
+            text = self.big_font.render(msg, True, settings.BLACK)
+            hint = self.font.render(settings.RESET_HINT, True, settings.BLACK)
+            
+            # Center text
+            text_rect = text.get_rect(center=(settings.SCREEN_WIDTH//2, settings.SCREEN_HEIGHT//2 - 30))
+            hint_rect = hint.get_rect(center=(settings.SCREEN_WIDTH//2, settings.SCREEN_HEIGHT//2 + 30))
+            
+            self.screen.blit(text, text_rect)
+            self.screen.blit(hint, hint_rect)
+
+    def reset_game(self):
+        """Reset the game state to start a new game."""
+        self.score_p1 = 0
+        self.score_p2 = 0
+        self.game_over = False
+        self.winner_side = None
+        self.is_serving = True
+        self.serving_player = self.starting_player
+        self.serve_angle = 0.0
+        
+        # Reset pieces
+        self.board = Board() # Re-create board to reset pieces
+        # Re-apply lives configuration if needed, but Board uses settings directly?
+        # Board.__init__ uses settings.CHESS_PIECES_LIVES, which we modified in apply_config.
+        # So re-creating Board is enough.
+        
+        # Reset ball
+        self.ball.reset(settings.SCREEN_WIDTH // 2, settings.SCREEN_HEIGHT // 2)
+        self.ball.vx = 0
+        self.ball.vy = 0
+        
+        # Reset paddles
+        self.top_paddle.reset()
+        self.bottom_paddle.reset()
+
+    def _draw_aiming_arrow(self):
+        """Draw an arrow indicating the serving direction."""
+        if not self.is_serving:
+            return
+            
+        import math
+        
+        # Determine start position (center of ball)
+        start_pos = (self.ball.x, self.ball.y)
+        
+        # Calculate end position based on angle
+        length = 50
+        rad = math.radians(self.serve_angle)
+        
+        # Direction vector
+        dx = length * math.sin(rad)
+        dy = length * math.cos(rad)
+        
+        if self.serving_player == 1:
+            end_pos = (start_pos[0] + dx, start_pos[1] + dy) # Down
+        else:
+            end_pos = (start_pos[0] + dx, start_pos[1] - dy) # Up
+            
+        # Draw line
+        pygame.draw.line(self.screen, settings.BLACK, start_pos, end_pos, 3)
+        
+        # Draw arrow head
+        # ... (simplified arrow head)
+        pygame.draw.circle(self.screen, settings.RED, (int(end_pos[0]), int(end_pos[1])), 5)
 
     def draw(self):
         self.screen.fill(settings.WHITE)
+
+        # Draw Navbar
+        self.draw_navbar()
 
         # Board hint background (checkerboard)
         self.board.draw_board_hint(self.screen)
@@ -280,10 +470,42 @@ class Game:
         for p in self.board.pieces:
             if p.is_alive():
                 p.draw(self.screen)
+        
+        # Draw aiming arrow if serving
+        if self.is_serving:
+            self._draw_aiming_arrow()
+            
         self.ball.draw(self.screen)
 
         self.draw_ui()
         pygame.display.flip()
+
+    def save_game(self):
+        """Save current game state to a JSON file."""
+        state = self.get_game_state()
+        try:
+            import json
+            with open("savegame.json", "w") as f:
+                json.dump(state, f, indent=4)
+            print("Game saved to savegame.json!")
+        except Exception as e:
+            print(f"Error saving game: {e}")
+
+    def load_game(self):
+        """Load game state from a JSON file."""
+        try:
+            import json
+            import os
+            if not os.path.exists("savegame.json"):
+                print("No save file found.")
+                return
+                
+            with open("savegame.json", "r") as f:
+                state = json.load(f)
+            self.set_game_state(state)
+            print("Game loaded from savegame.json!")
+        except Exception as e:
+            print(f"Error loading game: {e}")
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -296,7 +518,15 @@ class Game:
                     sys.exit(0)
                 if event.key == pygame.K_r and self.game_over:
                     # Reset pieces and state
-                    self.__init__()
+                    self.reset_game()
+            
+            # Handle Navbar clicks
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if hasattr(self, 'save_btn_rect') and self.save_btn_rect.collidepoint(mouse_pos):
+                    self.save_game()
+                elif hasattr(self, 'load_btn_rect') and self.load_btn_rect.collidepoint(mouse_pos):
+                    self.load_game()
 
     def run(self):
         while True:

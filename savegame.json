@@ -1,0 +1,281 @@
+{
+    "ball": {
+        "x": 308.0923798165725,
+        "y": 198.85622712759118,
+        "vx": 4.383711467890774,
+        "vy": -8.98794046299167
+    },
+    "top_paddle": {
+        "x": 111,
+        "y": 225
+    },
+    "bottom_paddle": {
+        "x": 223,
+        "y": 789
+    },
+    "pieces": [
+        {
+            "x": 17,
+            "y": 77,
+            "type": "tour",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 87,
+            "y": 77,
+            "type": "chevalier",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 77,
+            "type": "fou",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 77,
+            "type": "reine",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 297,
+            "y": 77,
+            "type": "roi",
+            "owner": 1,
+            "lives": 3,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 77,
+            "type": "fou",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 77,
+            "type": "chevalier",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 77,
+            "type": "tour",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 87,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 297,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 0,
+            "is_alive": false
+        },
+        {
+            "x": 367,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 0,
+            "is_alive": false
+        },
+        {
+            "x": 87,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 297,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 0,
+            "is_alive": false
+        },
+        {
+            "x": 507,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 917,
+            "type": "tour",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 87,
+            "y": 917,
+            "type": "chevalier",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 917,
+            "type": "fou",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 917,
+            "type": "reine",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 297,
+            "y": 917,
+            "type": "roi",
+            "owner": 2,
+            "lives": 3,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 917,
+            "type": "fou",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 917,
+            "type": "chevalier",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 917,
+            "type": "tour",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        }
+    ],
+    "game_over": false,
+    "winner_side": null,
+    "is_serving": false,
+    "serving_player": 1,
+    "serve_angle": 26.0,
+    "score_p1": 20,
+    "score_p2": 10
+}

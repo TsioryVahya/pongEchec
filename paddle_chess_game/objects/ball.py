@@ -77,7 +77,7 @@ class Ball:
                     continue  # Skip collision with own pieces
                 
                 # Damage and bounce
-                piece.take_damage(1)
+                piece.take_damage(settings.BALL_DAMAGE)
                 hit_piece = piece
                 
                 # Update ownership: the ball is now considered coming from this piece's owner

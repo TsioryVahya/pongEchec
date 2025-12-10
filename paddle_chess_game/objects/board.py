@@ -44,9 +44,10 @@ class Board:
         self.cell_width = cell_size  # Square cells
         self.cell_height = cell_size  # Square cells
         
-        # Center the board if there are margins
+        # Center the board horizontally
         self.board_left = (settings.SCREEN_WIDTH - cell_size * cols) // 2
-        self.board_top = (settings.SCREEN_HEIGHT - cell_size * rows) // 2
+        # Place board below navbar
+        self.board_top = settings.NAVBAR_HEIGHT
         
         # Determine which pieces to use based on board width
         # Full back rank: ["tour", "chevalier", "fou", "reine", "roi", "fou", "chevalier", "tour"]
