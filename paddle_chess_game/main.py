@@ -97,8 +97,12 @@ def run_host_game(screen, clock, port):
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r and game.game_over:
+                if event.key == pygame.K_r:
                     game.reset_game()
+                    game.paused = False
+                if event.key == pygame.K_SPACE:
+                    if not game.is_serving and not game.game_over:
+                        game.paused = not game.paused
         
         # Host Logic:
         # 1. Get Remote Input (Player 2)
@@ -125,6 +129,10 @@ def run_host_game(screen, clock, port):
 
         if keys[pygame.K_SPACE] and game.is_serving and game.serving_player == 1:
             game._serve_ball()
+        
+        # Power Shot for Host
+        if keys[pygame.K_p] and not game.is_serving:
+            game.direct_ball_to_king()
             
         # 3. Update Game
         game.update()
@@ -201,7 +209,8 @@ def run_client_game(screen, clock, ip, port):
             'right': keys[pygame.K_RIGHT],
             'up': keys[pygame.K_UP],
             'down': keys[pygame.K_DOWN],
-            'space': keys[pygame.K_SPACE]
+            'space': keys[pygame.K_SPACE],
+            'p': keys[pygame.K_p]
         }
         client.send_input(inputs)
         
