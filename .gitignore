@@ -5,3 +5,8 @@ __pycache__/
 # Optional: compiled Python files
 *.py[cod]
 *$py.class
+paddle_chess_game/objects/__pycache__/board.cpython-314.pyc
+/paddle_chess_game/__pycache__
+/paddle_chess_game/__pycache__
+/paddle_chess_game/objects/__pycache__
+/paddle_chess_game/utils
