@@ -1,6 +1,6 @@
 # Paddle + Chess (Python, Pygame)
 
-Un jeu original mêlant Pong (paddles + balle) et des pièces d'échecs statiques qui servent d'obstacles avec des points de vie. Si le roi adverse perd toutes ses vies, vous gagnez.
+Un jeu original mêlant Pong (paddles + balle) et des pièces d'échecs statiques qui servent d'obstacles avec des points de vie. Si le roi adverse perd toutes ses vies, vous gagnez .Enjoy!
 
 ## Lancer le jeu
 
