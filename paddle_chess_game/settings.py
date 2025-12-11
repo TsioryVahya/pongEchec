@@ -61,5 +61,5 @@ PIECE_SPACING_Y = 8
 
 # UI / Fonts
 TITLE = "Paddle + Chess"
-WIN_TEXT = "Victoire ! Le roi adverse est K.O."
+WIN_TEXT = "Victoire , felicitations ! Le roi adverse est K.O."
 RESET_HINT = "Appuie sur R pour rejouer, ESC pour quitter"
