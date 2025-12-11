@@ -11,6 +11,10 @@ class Paddle:
         self.color = color
         self.speed = speed
         self.owner = owner  # 1 for player 1, 2 for player 2
+        
+        # Store initial position for reset
+        self.initial_x = x
+        self.initial_y = y
 
     def move(self, left: bool, bounds: pygame.Rect):
         """Move paddle horizontally (left or right)."""
@@ -24,6 +28,11 @@ class Paddle:
             self.rect.left = bounds.left
         if self.rect.right > bounds.right:
             self.rect.right = bounds.right
+
+    def reset(self):
+        """Reset paddle to initial position."""
+        self.rect.x = self.initial_x
+        self.rect.y = self.initial_y
 
     def draw(self, surface: pygame.Surface):
         pygame.draw.rect(surface, self.color, self.rect)
