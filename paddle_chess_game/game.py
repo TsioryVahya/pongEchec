@@ -106,6 +106,9 @@ class Game:
         self.score_p1 = 0
         self.score_p2 = 0
         
+        # Pause state
+        self.paused = False
+        
         # Apply piece lives
         settings.CHESS_PIECES_LIVES['roi'] = config.get('roi_lives', settings.CHESS_PIECES_LIVES['roi'])
         settings.CHESS_PIECES_LIVES['reine'] = config.get('reine_lives', settings.CHESS_PIECES_LIVES['reine'])
@@ -183,6 +186,10 @@ class Game:
                  self._serve_ball()
             elif self.serving_player == 2 and (keys[pygame.K_SPACE]): # P2 serve
                  self._serve_ball()
+        
+        # Handle Power Shot (P key) - Direct ball to opponent king
+        if keys[pygame.K_p] and not self.is_serving:
+            self.direct_ball_to_king()
 
     def process_remote_input(self, player_id: int, input_data: Dict[str, bool]):
         """Process inputs received from network for the remote player."""
@@ -207,6 +214,11 @@ class Game:
                     
             if input_data.get('space') and self.is_serving and self.serving_player == 1:
                 self._serve_ball()
+            
+            # Power Shot
+            if input_data.get('p') and not self.is_serving:
+                self.direct_ball_to_king()
+                
         elif player_id == 2:
             # Remote is Player 2 (Bottom)
             if input_data.get('left'):
@@ -223,6 +235,10 @@ class Game:
                     
             if input_data.get('space') and self.is_serving and self.serving_player == 2:
                 self._serve_ball()
+            
+            # Power Shot
+            if input_data.get('p') and not self.is_serving:
+                self.direct_ball_to_king()
 
     def _serve_ball(self):
         """Launch the ball from serving state using current aim angle."""
@@ -248,7 +264,7 @@ class Game:
         self.ball.vx = vx
 
     def update(self):
-        if self.game_over:
+        if self.game_over or self.paused:
             return
             
         if self.is_serving:
@@ -382,6 +398,20 @@ class Game:
         self.screen.blit(load_text, load_text.get_rect(center=self.load_btn_rect.center))
 
     def draw_ui(self):
+        # Pause overlay
+        if self.paused:
+            overlay = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+            overlay.set_alpha(128)
+            overlay.fill(settings.BLACK)
+            self.screen.blit(overlay, (0, 0))
+            
+            pause_text = self.big_font.render("PAUSE", True, settings.WHITE)
+            hint_text = self.font.render("Appuyez sur ESPACE pour reprendre", True, settings.WHITE)
+            
+            self.screen.blit(pause_text, pause_text.get_rect(center=(settings.SCREEN_WIDTH//2, settings.SCREEN_HEIGHT//2 - 30)))
+            self.screen.blit(hint_text, hint_text.get_rect(center=(settings.SCREEN_WIDTH//2, settings.SCREEN_HEIGHT//2 + 30)))
+            return
+        
         # Only draw Game Over overlay here
         if self.game_over:
             # Draw semi-transparent overlay
@@ -425,6 +455,33 @@ class Game:
         # Reset paddles
         self.top_paddle.reset()
         self.bottom_paddle.reset()
+
+    def direct_ball_to_king(self):
+        """Direct the ball towards the opponent's king based on who last touched it."""
+        if self.ball.last_touched_by is None:
+            print("No player has touched the ball yet.")
+            return
+        
+        # Determine opponent
+        opponent = 2 if self.ball.last_touched_by == 1 else 1
+        
+        # Find opponent's king
+        king = None
+        for piece in self.board.pieces:
+            if piece.type == "roi" and piece.owner == opponent and piece.is_alive():
+                king = piece
+                break
+        
+        if king is None:
+            print(f"King of player {opponent} not found or already destroyed.")
+            return
+        
+        # Direct ball to king's center
+        king_center_x = king.rect.centerx
+        king_center_y = king.rect.centery
+        
+        self.ball.direct_to(king_center_x, king_center_y)
+        print(f"Ball directed to Player {opponent}'s King!")
 
     def _draw_aiming_arrow(self):
         """Draw an arrow indicating the serving direction."""
@@ -516,9 +573,16 @@ class Game:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit(0)
-                if event.key == pygame.K_r and self.game_over:
-                    # Reset pieces and state
+                    
+                # Reset game (R key - works anytime)
+                if event.key == pygame.K_r:
                     self.reset_game()
+                    self.paused = False  # Unpause if paused
+                
+                # Toggle pause (SPACE key - only if not serving or game over)
+                if event.key == pygame.K_SPACE:
+                    if not self.is_serving and not self.game_over:
+                        self.paused = not self.paused
             
             # Handle Navbar clicks
             if event.type == pygame.MOUSEBUTTONDOWN:

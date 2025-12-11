@@ -116,5 +116,37 @@ class Ball:
                 break
         return hit_piece
 
+    def direct_to(self, target_x: int, target_y: int, speed: float = None):
+        """Direct the ball towards a target position.
+        
+        Args:
+            target_x: X coordinate of the target
+            target_y: Y coordinate of the target
+            speed: Optional speed magnitude (uses current speed if not specified)
+        """
+        import math
+        
+        # Calculate direction vector
+        dx = target_x - self.x
+        dy = target_y - self.y
+        distance = math.sqrt(dx**2 + dy**2)
+        
+        if distance == 0:
+            return  # Already at target
+        
+        # Normalize direction
+        dx /= distance
+        dy /= distance
+        
+        # Use current speed magnitude if not specified
+        if speed is None:
+            speed = math.sqrt(self.vx**2 + self.vy**2)
+            if speed == 0:
+                speed = max(abs(settings.BALL_SPEED_X), abs(settings.BALL_SPEED_Y))
+        
+        # Set velocity towards target
+        self.vx = dx * speed
+        self.vy = dy * speed
+
     def draw(self, surface: pygame.Surface):
         pygame.draw.circle(surface, self.color, (int(self.x), int(self.y)), self.radius)
