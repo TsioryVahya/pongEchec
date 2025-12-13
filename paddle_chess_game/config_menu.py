@@ -2,16 +2,36 @@ import pygame
 import sys
 from typing import Dict, Any
 from paddle_chess_game import settings
+from paddle_chess_game.services.config_service import ConfigurationService
 
 
 class ConfigMenu:
     """Configuration menu displayed before the game starts."""
     
+    # Colors
+    BG_COLOR = (30, 30, 40)
+    TEXT_COLOR = (240, 240, 240)
+    INPUT_BG = (50, 50, 60)
+    INPUT_BORDER = (100, 100, 120)
+    INPUT_ACTIVE = (70, 130, 180)
+    BUTTON_BG = (60, 160, 80)
+    BUTTON_HOVER = (80, 180, 100)
+    SERVER_BTN_BG = (70, 130, 180)
+    
     def __init__(self, screen: pygame.Surface):
         self.screen = screen
-        self.font = pygame.font.SysFont(None, 32)
-        self.title_font = pygame.font.SysFont(None, 48)
-        self.small_font = pygame.font.SysFont(None, 24)
+        self.width = screen.get_width()
+        self.height = screen.get_height()
+        
+        self.font = pygame.font.SysFont("Segoe UI", 24)
+        self.title_font = pygame.font.SysFont("Segoe UI", 48, bold=True)
+        self.small_font = pygame.font.SysFont("Segoe UI", 18)
+        
+        # Backend Service
+        self.config_service = ConfigurationService("http://localhost:8080/pongechec/api")
+        self.server_configs = []
+        self.status_message = ""
+        self.status_timer = 0
         
         # Configuration values (default from settings)
         self.config = {
@@ -35,61 +55,97 @@ class ConfigMenu:
             'pion_points': settings.PIECE_VALUES['pion'],
         }
         
-        # Track which field is selected
         self.selected_field = None
         self.input_text = ""
         
-        # Define input fields with positions (x, y)
-        # Global settings
-        self.fields = {
-            'ball_speed': {'label': 'Vitesse balle', 'x': 50, 'y': 120, 'min': 1, 'max': 20},
-            'ball_damage': {'label': 'Degats balle', 'x': 50, 'y': 160, 'min': 1, 'max': 10},
-            'board_width': {'label': 'Largeur echiquier', 'x': 50, 'y': 200, 'min': 2, 'max': 8, 'step': 2},
-            'starting_player': {'label': 'Joueur debutant', 'x': 50, 'y': 240, 'min': 1, 'max': 2},
+        # Define fields metadata
+        self.fields_meta = {
+            'ball_speed': {'label': 'Vitesse balle', 'min': 1, 'max': 20},
+            'ball_damage': {'label': 'Dégâts balle', 'min': 1, 'max': 10},
+            'board_width': {'label': 'Largeur échiquier', 'min': 2, 'max': 8, 'step': 2},
+            'starting_player': {'label': 'Joueur débutant', 'min': 1, 'max': 2},
+            
+            'roi_lives': {'label': 'Vies Roi', 'min': 1, 'max': 10},
+            'reine_lives': {'label': 'Vies Reine', 'min': 1, 'max': 10},
+            'fou_lives': {'label': 'Vies Fou', 'min': 1, 'max': 10},
+            'tour_lives': {'label': 'Vies Tour', 'min': 1, 'max': 10},
+            'chevalier_lives': {'label': 'Vies Chevalier', 'min': 1, 'max': 10},
+            'pion_lives': {'label': 'Vies Pion', 'min': 1, 'max': 10},
+            
+            'roi_points': {'label': 'Points Roi', 'min': 0, 'max': 1000},
+            'reine_points': {'label': 'Points Reine', 'min': 0, 'max': 1000},
+            'fou_points': {'label': 'Points Fou', 'min': 0, 'max': 1000},
+            'tour_points': {'label': 'Points Tour', 'min': 0, 'max': 1000},
+            'chevalier_points': {'label': 'Points Chevalier', 'min': 0, 'max': 1000},
+            'pion_points': {'label': 'Points Pion', 'min': 0, 'max': 1000},
         }
         
-        # Lives (Left Column)
-        y_start = 300
-        step = 40
-        self.fields.update({
-            'roi_lives': {'label': 'Vies Roi', 'x': 50, 'y': y_start, 'min': 1, 'max': 10},
-            'reine_lives': {'label': 'Vies Reine', 'x': 50, 'y': y_start + step, 'min': 1, 'max': 10},
-            'fou_lives': {'label': 'Vies Fou', 'x': 50, 'y': y_start + step*2, 'min': 1, 'max': 10},
-            'tour_lives': {'label': 'Vies Tour', 'x': 50, 'y': y_start + step*3, 'min': 1, 'max': 10},
-            'chevalier_lives': {'label': 'Vies Chevalier', 'x': 50, 'y': y_start + step*4, 'min': 1, 'max': 10},
-            'pion_lives': {'label': 'Vies Pion', 'x': 50, 'y': y_start + step*5, 'min': 1, 'max': 10},
-        })
-
-        # Points (Right Column)
-        x_col2 = settings.SCREEN_WIDTH // 2 + 20
-        self.fields.update({
-            'roi_points': {'label': 'Points Roi', 'x': x_col2, 'y': y_start, 'min': 0, 'max': 1000},
-            'reine_points': {'label': 'Points Reine', 'x': x_col2, 'y': y_start + step, 'min': 0, 'max': 1000},
-            'fou_points': {'label': 'Points Fou', 'x': x_col2, 'y': y_start + step*2, 'min': 0, 'max': 1000},
-            'tour_points': {'label': 'Points Tour', 'x': x_col2, 'y': y_start + step*3, 'min': 0, 'max': 1000},
-            'chevalier_points': {'label': 'Points Chevalier', 'x': x_col2, 'y': y_start + step*4, 'min': 0, 'max': 1000},
-            'pion_points': {'label': 'Points Pion', 'x': x_col2, 'y': y_start + step*5, 'min': 0, 'max': 1000},
-        })
+        self._recalculate_layout()
         
-        # Start button
-        self.start_button_rect = pygame.Rect(
-            settings.SCREEN_WIDTH // 2 - 100,
-            settings.SCREEN_HEIGHT - 80,
-            200,
-            50
+    def _recalculate_layout(self):
+        """Recalculate positions based on screen size."""
+        self.width = self.screen.get_width()
+        self.height = self.screen.get_height()
+        
+        # Center column x
+        col1_x = self.width * 0.15
+        col2_x = self.width * 0.45
+        col3_x = self.width * 0.75
+        
+        start_y = self.height * 0.2
+        step_y = 50
+        
+        self.ui_elements = {}
+        
+        # General Settings (Col 1)
+        general_keys = ['ball_speed', 'ball_damage', 'board_width', 'starting_player']
+        for i, key in enumerate(general_keys):
+            self.ui_elements[key] = {
+                'label_pos': (col1_x, start_y + i * step_y),
+                'input_rect': pygame.Rect(col1_x + 150, start_y + i * step_y - 5, 80, 35)
+            }
+            
+        # Lives (Col 2)
+        lives_keys = ['roi_lives', 'reine_lives', 'fou_lives', 'tour_lives', 'chevalier_lives', 'pion_lives']
+        for i, key in enumerate(lives_keys):
+            self.ui_elements[key] = {
+                'label_pos': (col2_x, start_y + i * step_y),
+                'input_rect': pygame.Rect(col2_x + 150, start_y + i * step_y - 5, 80, 35)
+            }
+            
+        # Points (Col 3)
+        points_keys = ['roi_points', 'reine_points', 'fou_points', 'tour_points', 'chevalier_points', 'pion_points']
+        for i, key in enumerate(points_keys):
+            self.ui_elements[key] = {
+                'label_pos': (col3_x, start_y + i * step_y),
+                'input_rect': pygame.Rect(col3_x + 150, start_y + i * step_y - 5, 80, 35)
+            }
+            
+        # Buttons
+        btn_width = 220
+        btn_height = 50
+        margin = 20
+        
+        # Start Button (Center Bottom)
+        self.start_btn_rect = pygame.Rect(
+            (self.width - btn_width) // 2,
+            self.height - 80,
+            btn_width,
+            btn_height
         )
-    
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        """
-        Handle events in the config menu.
         
-        Returns:
-            True if user wants to start the game, False otherwise
-        """
+        # Server Buttons (Bottom Left/Right)
+        self.load_btn_rect = pygame.Rect(margin, self.height - 70, 180, 40)
+        self.save_btn_rect = pygame.Rect(self.width - 180 - margin, self.height - 70, 180, 40)
+
+    def handle_event(self, event: pygame.event.Event) -> bool:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit(0)
-        
+            
+        if event.type == pygame.VIDEORESIZE:
+            self._recalculate_layout()
+            
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
@@ -97,7 +153,6 @@ class ConfigMenu:
             
             if self.selected_field:
                 if event.key == pygame.K_RETURN or event.key == pygame.K_TAB:
-                    # Validate and save input
                     self._save_current_field()
                     self.selected_field = None
                     self.input_text = ""
@@ -105,7 +160,7 @@ class ConfigMenu:
                     self.input_text = self.input_text[:-1]
                 elif event.unicode.isdigit():
                     self.input_text += event.unicode
-        
+                    
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             
@@ -113,82 +168,121 @@ class ConfigMenu:
             if self.selected_field:
                 self._save_current_field()
             
-            # Check if start button clicked
-            if self.start_button_rect.collidepoint(mouse_pos):
-                return True  # Start game
-            
-            # Check if any field clicked
+            # Check Buttons
+            if self.start_btn_rect.collidepoint(mouse_pos):
+                return True
+            if self.load_btn_rect.collidepoint(mouse_pos):
+                self._load_from_server()
+                return False
+            if self.save_btn_rect.collidepoint(mouse_pos):
+                self._save_to_server()
+                return False
+                
+            # Check Input Fields
             self.selected_field = None
-            for field_name, field_info in self.fields.items():
-                # Box is at x + 180 (approx)
-                box_x = field_info['x'] + 180
-                field_rect = pygame.Rect(box_x, field_info['y'] - 5, 60, 30)
-                if field_rect.collidepoint(mouse_pos):
-                    self.selected_field = field_name
-                    self.input_text = str(self.config[field_name])
+            for key, element in self.ui_elements.items():
+                if element['input_rect'].collidepoint(mouse_pos):
+                    self.selected_field = key
+                    self.input_text = str(self.config[key])
                     break
-        
+                    
         return False
-    
+
+    def _load_from_server(self):
+        if self.config_service.test_connection():
+            self.server_configs = self.config_service.get_all_configurations()
+            if self.server_configs:
+                # Mode Singleton: On charge directement la première configuration
+                config = self.server_configs[0]
+                self._apply_config(config)
+                self.status_message = f"Configuration chargée!"
+            else:
+                self.status_message = "Aucune configuration trouvée."
+        else:
+            self.status_message = "Erreur: Backend inaccessible!"
+        self.status_timer = pygame.time.get_ticks() + 3000
+
+    def _save_to_server(self):
+        if self.config_service.test_connection():
+            # Mode Singleton: On garde un nom fixe
+            name = "Configuration Standard"
+            result = self.config_service.save_configuration(self.config, name)
+            if result:
+                self.status_message = "Configuration sauvegardée!"
+            else:
+                self.status_message = "Erreur lors de la sauvegarde."
+        else:
+            self.status_message = "Erreur: Backend inaccessible!"
+        self.status_timer = pygame.time.get_ticks() + 3000
+
+    def _apply_config(self, config):
+        for key in self.config:
+            if key in config:
+                self.config[key] = config[key]
+
     def _save_current_field(self):
-        """Save the current input field value."""
         if self.selected_field and self.input_text:
             try:
                 value = int(self.input_text)
-                field_info = self.fields[self.selected_field]
-                # Clamp value to min/max
-                value = max(field_info['min'], min(field_info['max'], value))
+                meta = self.fields_meta[self.selected_field]
+                value = max(meta['min'], min(meta['max'], value))
                 self.config[self.selected_field] = value
             except ValueError:
-                pass  # Keep old value if input is invalid
-    
+                pass
+
     def draw(self):
-        """Draw the configuration menu."""
-        self.screen.fill(settings.WHITE)
+        self.screen.fill(self.BG_COLOR)
         
         # Title
-        title = self.title_font.render("Configuration du Jeu", True, settings.BLACK)
-        self.screen.blit(title, title.get_rect(center=(settings.SCREEN_WIDTH // 2, 50)))
+        title = self.title_font.render("CONFIGURATION DU JEU", True, self.TEXT_COLOR)
+        self.screen.blit(title, title.get_rect(center=(self.width // 2, 50)))
         
-        # Draw fields
-        for field_name, field_info in self.fields.items():
-            x = field_info['x']
-            y = field_info['y']
+        # Draw Fields
+        for key, element in self.ui_elements.items():
+            label_pos = element['label_pos']
+            rect = element['input_rect']
             
             # Label
-            label = self.small_font.render(field_info['label'] + ":", True, settings.BLACK)
-            self.screen.blit(label, (x, y))
+            label = self.font.render(self.fields_meta[key]['label'], True, self.TEXT_COLOR)
+            self.screen.blit(label, label_pos)
             
-            # Value box
-            value_text = str(self.config[field_name])
-            if self.selected_field == field_name:
-                value_text = self.input_text
-                color = settings.BLUE
-            else:
-                color = settings.GREY
+            # Input Box
+            color = self.INPUT_ACTIVE if self.selected_field == key else self.INPUT_BORDER
+            pygame.draw.rect(self.screen, self.INPUT_BG, rect, border_radius=5)
+            pygame.draw.rect(self.screen, color, rect, 2, border_radius=5)
             
-            # Draw box
-            box_x = x + 180
-            box_rect = pygame.Rect(box_x, y - 5, 60, 30)
-            pygame.draw.rect(self.screen, color, box_rect, 2)
+            # Value
+            val_text = self.input_text if self.selected_field == key else str(self.config[key])
+            text_surf = self.font.render(val_text, True, self.TEXT_COLOR)
+            text_rect = text_surf.get_rect(center=rect.center)
+            self.screen.blit(text_surf, text_rect)
             
-            # Draw value
-            value_surface = self.font.render(value_text, True, settings.BLACK)
-            # Center text in box
-            text_rect = value_surface.get_rect(center=box_rect.center)
-            self.screen.blit(value_surface, text_rect)
-            
-        # Start button
-        button_color = settings.GREEN if self.start_button_rect.collidepoint(pygame.mouse.get_pos()) else settings.BLUE
-        pygame.draw.rect(self.screen, button_color, self.start_button_rect)
-        pygame.draw.rect(self.screen, settings.BLACK, self.start_button_rect, 3)
+        # Draw Buttons
+        # Start
+        mouse_pos = pygame.mouse.get_pos()
+        start_color = self.BUTTON_HOVER if self.start_btn_rect.collidepoint(mouse_pos) else self.BUTTON_BG
+        pygame.draw.rect(self.screen, start_color, self.start_btn_rect, border_radius=10)
+        start_txt = self.title_font.render("JOUER", True, settings.WHITE)
+        start_txt = pygame.transform.scale(start_txt, (int(start_txt.get_width()*0.7), int(start_txt.get_height()*0.7)))
+        self.screen.blit(start_txt, start_txt.get_rect(center=self.start_btn_rect.center))
         
-        start_text = self.font.render("COMMENCER", True, settings.WHITE)
-        text_rect = start_text.get_rect(center=self.start_button_rect.center)
-        self.screen.blit(start_text, text_rect)
+        # Server Buttons
+        load_color = self.BUTTON_HOVER if self.load_btn_rect.collidepoint(mouse_pos) else self.SERVER_BTN_BG
+        pygame.draw.rect(self.screen, load_color, self.load_btn_rect, border_radius=8)
+        load_txt = self.small_font.render("Charger (Serveur)", True, settings.WHITE)
+        self.screen.blit(load_txt, load_txt.get_rect(center=self.load_btn_rect.center))
         
+        save_color = self.BUTTON_HOVER if self.save_btn_rect.collidepoint(mouse_pos) else self.SERVER_BTN_BG
+        pygame.draw.rect(self.screen, save_color, self.save_btn_rect, border_radius=8)
+        save_txt = self.small_font.render("Sauver (Serveur)", True, settings.WHITE)
+        self.screen.blit(save_txt, save_txt.get_rect(center=self.save_btn_rect.center))
+        
+        # Status Message
+        if self.status_message and pygame.time.get_ticks() < self.status_timer:
+            status = self.font.render(self.status_message, True, (255, 100, 100))
+            self.screen.blit(status, status.get_rect(center=(self.width//2, self.height - 120)))
+            
         pygame.display.flip()
-    
+
     def get_config(self) -> Dict[str, Any]:
-        """Get the final configuration."""
         return self.config.copy()

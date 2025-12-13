@@ -481,7 +481,7 @@ class Game:
         king_center_y = king.rect.centery
         
         self.ball.direct_to(king_center_x, king_center_y)
-        print(f"Ball directed to Player {opponent}'s King!")
+        #print(f"Ball directed to Player {opponent}'s King!")
 
     def _draw_aiming_arrow(self):
         """Draw an arrow indicating the serving direction."""

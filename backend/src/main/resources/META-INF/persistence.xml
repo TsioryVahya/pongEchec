@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence 
+             https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+    
+    <persistence-unit name="PongEchecPU" transaction-type="JTA">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        
+        <!-- Source de données JNDI (à configurer sur le serveur) -->
+        <jta-data-source>java:jboss/datasources/PongEchecDS</jta-data-source>
+        
+        <!-- Classes d'entités -->
+        <class>com.pongechec.entity.GameConfiguration</class>
+        
+        <properties>
+            <!-- Dialecte PostgreSQL -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+            
+            <!-- Création/mise à jour automatique du schéma -->
+            <!-- update : met à jour le schéma sans supprimer les données -->
+            <!-- create : recrée le schéma à chaque déploiement (dev only) -->
+            <!-- validate : valide le schéma (production) -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            
+            <!-- Afficher les requêtes SQL (dev only) -->
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            
+            <!-- UTF-8 -->
+            <property name="hibernate.connection.charSet" value="UTF-8"/>
+        </properties>
+    </persistence-unit>
+</persistence>

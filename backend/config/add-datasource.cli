@@ -1,0 +1,27 @@
+# Script CLI WildFly pour créer la datasource PongEchec
+# Exécuter avec WildFly démarré : jboss-cli.bat --connect --file=add-datasource.cli
+
+# 1. Ajouter le driver PostgreSQL (si pas déjà présent)
+if (outcome == failed) of /subsystem=datasources/jdbc-driver=postgresql:read-resource
+    /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver)
+end-if
+
+# 2. Créer la datasource PongEchec avec la bonne syntaxe
+if (outcome == failed) of /subsystem=datasources/data-source=PongEchecDS:read-resource
+    data-source add \
+        --name=PongEchecDS \
+        --jndi-name=java:/PongEchecDS \
+        --driver-name=postgresql \
+        --connection-url=jdbc:postgresql://localhost:5432/pongechec_db \
+        --user-name=postgres \
+        --password=admin \
+        --enabled=true \
+        --use-java-context=true \
+        --max-pool-size=25 \
+        --min-pool-size=5
+end-if
+
+# 3. Tester la connexion
+/subsystem=datasources/data-source=PongEchecDS:test-connection-in-pool
+
+echo "DataSource PongEchecDS créée avec succès!"

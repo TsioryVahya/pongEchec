@@ -1,0 +1,29 @@
+# Script CLI WildFly pour configurer PongEchec DataSource
+# Exécuter avec : jboss-cli.bat --connect --file=setup-datasource.cli
+
+# 1. Ajouter le module PostgreSQL (si pas déjà fait)
+# Note: Le driver JAR doit être copié manuellement dans modules/org/postgresql/main/
+
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql,driver-module-name=org.postgresql,driver-class-name=org.postgresql.Driver,driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+
+# 2. Créer la datasource PongEchec
+data-source add \
+    --name=PongEchecDS \
+    --jndi-name=java:/PongEchecDS \
+    --driver-name=postgresql \
+    --connection-url=jdbc:postgresql://localhost:5432/pongechec_db \
+    --user-name=pongechec_user \
+    --password=votre_mot_de_passe \
+    --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker \
+    --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter \
+    --enabled=true \
+    --use-java-context=true \
+    --use-ccm=true
+
+# 3. Tester la connexion
+/subsystem=datasources/data-source=PongEchecDS:test-connection-in-pool
+
+# 4. Afficher la configuration
+/subsystem=datasources/data-source=PongEchecDS:read-resource(recursive=true)
+
+echo "DataSource PongEchecDS configurée avec succès!"
