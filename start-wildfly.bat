@@ -4,7 +4,7 @@ echo 🔥 START WILDFLY - GESTION ETUDIANTE
 echo ==========================================
 
 :: Configuration WildFly
-set WILDFLY_HOME=G:\ITU\S5\PROG\wildfly\wildfly-37.0.1.Final\
+set WILDFLY_HOME=E:\wildfly-37.0.1.Final\
 
 echo.
 echo 📋 Vérification de WildFly...

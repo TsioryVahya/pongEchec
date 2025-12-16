@@ -1,89 +1,281 @@
 {
     "ball": {
-        "x": 317.00007707674916,
-        "y": 887.4686045488837,
-        "vx": 1.620332728586049e-07,
-        "vy": 5.049460957277396
+        "x": 136.3518540909838,
+        "y": 598.6877707974289,
+        "vx": -0.37337104587507114,
+        "vy": 2.121320343559643
     },
     "top_paddle": {
-        "x": 206,
-        "y": 233
+        "x": 0,
+        "y": 225
     },
     "bottom_paddle": {
-        "x": 206,
-        "y": 833
+        "x": 47,
+        "y": 789
     },
     "pieces": [
         {
-            "x": 225,
-            "y": 79,
+            "x": 17,
+            "y": 77,
+            "type": "tour",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 87,
+            "y": 77,
+            "type": "chevalier",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 77,
+            "type": "fou",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 77,
             "type": "reine",
             "owner": 1,
             "lives": 2,
             "is_alive": true
         },
         {
-            "x": 299,
-            "y": 79,
+            "x": 297,
+            "y": 77,
             "type": "roi",
             "owner": 1,
-            "lives": 1,
+            "lives": 4,
             "is_alive": true
         },
         {
-            "x": 225,
-            "y": 153,
+            "x": 367,
+            "y": 77,
+            "type": "fou",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 77,
+            "type": "chevalier",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 77,
+            "type": "tour",
+            "owner": 1,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 147,
             "type": "pion",
             "owner": 1,
             "lives": 1,
             "is_alive": true
         },
         {
-            "x": 299,
-            "y": 153,
+            "x": 87,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 147,
             "type": "pion",
             "owner": 1,
             "lives": 0,
             "is_alive": false
         },
         {
-            "x": 225,
-            "y": 893,
+            "x": 297,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 0,
+            "is_alive": false
+        },
+        {
+            "x": 437,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 147,
+            "type": "pion",
+            "owner": 1,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 847,
             "type": "pion",
             "owner": 2,
             "lives": 1,
             "is_alive": true
         },
         {
-            "x": 299,
-            "y": 893,
+            "x": 87,
+            "y": 847,
             "type": "pion",
             "owner": 2,
-            "lives": 0,
-            "is_alive": false
+            "lives": 1,
+            "is_alive": true
         },
         {
-            "x": 225,
-            "y": 967,
+            "x": 157,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 297,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 847,
+            "type": "pion",
+            "owner": 2,
+            "lives": 1,
+            "is_alive": true
+        },
+        {
+            "x": 17,
+            "y": 917,
+            "type": "tour",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 87,
+            "y": 917,
+            "type": "chevalier",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 157,
+            "y": 917,
+            "type": "fou",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 227,
+            "y": 917,
             "type": "reine",
             "owner": 2,
             "lives": 2,
             "is_alive": true
         },
         {
-            "x": 299,
-            "y": 967,
+            "x": 297,
+            "y": 917,
             "type": "roi",
             "owner": 2,
-            "lives": 1,
+            "lives": 4,
+            "is_alive": true
+        },
+        {
+            "x": 367,
+            "y": 917,
+            "type": "fou",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 437,
+            "y": 917,
+            "type": "chevalier",
+            "owner": 2,
+            "lives": 2,
+            "is_alive": true
+        },
+        {
+            "x": 507,
+            "y": 917,
+            "type": "tour",
+            "owner": 2,
+            "lives": 2,
             "is_alive": true
         }
     ],
     "game_over": false,
     "winner_side": null,
     "is_serving": false,
-    "serving_player": 2,
-    "serve_angle": 0.0,
-    "score_p1": 10,
-    "score_p2": 10
+    "serving_player": 1,
+    "serve_angle": 45,
+    "score_p1": 0,
+    "score_p2": 20
 }
