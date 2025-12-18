@@ -9,8 +9,8 @@
     <connection-url>jdbc:postgresql://localhost:5432/pongechec_db</connection-url>
     <driver>postgresql</driver>
     <security>
-        <user-name>pongechec_user</user-name>
-        <password>votre_mot_de_passe</password>
+        <user-name>postgres</user-name>
+        <password>postgres</password>
     </security>
     <validation>
         <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"/>
