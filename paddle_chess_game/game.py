@@ -371,7 +371,14 @@ class Game:
             })
             
         return {
-            'ball': {'x': self.ball.x, 'y': self.ball.y, 'vx': self.ball.vx, 'vy': self.ball.vy},
+            'ball': {
+                'x': self.ball.x, 
+                'y': self.ball.y, 
+                'vx': self.ball.vx, 
+                'vy': self.ball.vy,
+                'is_special': self.ball.is_special,
+                'current_damage': self.ball.current_damage
+            },
             'top_paddle': {'x': self.top_paddle.rect.x, 'y': self.top_paddle.rect.y},
             'bottom_paddle': {'x': self.bottom_paddle.rect.x, 'y': self.bottom_paddle.rect.y},
             'pieces': pieces_data,
@@ -381,7 +388,9 @@ class Game:
             'serving_player': self.serving_player,
             'serve_angle': self.serve_angle,
             'score_p1': self.score_p1,
-            'score_p2': self.score_p2
+            'score_p2': self.score_p2,
+            'special_bar': self.special_bar,
+            'special_just_activated': self.special_just_activated
         }
 
     def set_game_state(self, state: Dict[str, Any]):
@@ -417,6 +426,15 @@ class Game:
         self.serve_angle = state.get('serve_angle', 0.0)
         self.score_p1 = state.get('score_p1', 0)
         self.score_p2 = state.get('score_p2', 0)
+        
+        # Update special ability state
+        self.special_bar = state.get('special_bar', 0)
+        self.special_just_activated = state.get('special_just_activated', False)
+        
+        # Update ball special state
+        ball_state = state.get('ball', {})
+        self.ball.is_special = ball_state.get('is_special', False)
+        self.ball.current_damage = ball_state.get('current_damage', settings.BALL_DAMAGE)
 
     def draw_navbar(self):
         """Draw the top navigation bar with scores and buttons."""
