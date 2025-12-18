@@ -53,6 +53,9 @@ class ConfigMenu:
             'tour_points': settings.PIECE_VALUES['tour'],
             'chevalier_points': settings.PIECE_VALUES['chevalier'],
             'pion_points': settings.PIECE_VALUES['pion'],
+            # Special
+            'special_bar_max': settings.SPECIAL_BAR_MAX,
+            'special_ball_damage': settings.SPECIAL_BALL_DAMAGE,
         }
         
         self.selected_field = None
@@ -78,6 +81,9 @@ class ConfigMenu:
             'tour_points': {'label': 'Points Tour', 'min': 0, 'max': 1000},
             'chevalier_points': {'label': 'Points Chevalier', 'min': 0, 'max': 1000},
             'pion_points': {'label': 'Points Pion', 'min': 0, 'max': 1000},
+            
+            'special_bar_max': {'label': 'Max Barre Spéciale', 'min': 1, 'max': 50},
+            'special_ball_damage': {'label': 'Dégâts Spéciaux', 'min': 1, 'max': 20},
         }
         
         self._recalculate_layout()
@@ -98,7 +104,7 @@ class ConfigMenu:
         self.ui_elements = {}
         
         # General Settings (Col 1)
-        general_keys = ['ball_speed', 'ball_damage', 'board_width', 'starting_player']
+        general_keys = ['ball_speed', 'ball_damage', 'board_width', 'starting_player', 'special_bar_max', 'special_ball_damage']
         for i, key in enumerate(general_keys):
             self.ui_elements[key] = {
                 'label_pos': (col1_x, start_y + i * step_y),
