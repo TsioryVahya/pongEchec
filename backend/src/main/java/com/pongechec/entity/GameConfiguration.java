@@ -80,6 +80,13 @@ public class GameConfiguration implements Serializable {
     
     @Column(name = "pion_points", nullable = false)
     private Integer pionPoints = 10;
+
+    // Capacités Spéciales
+    @Column(name = "special_bar_max", nullable = false)
+    private Integer specialBarMax = 10;
+
+    @Column(name = "special_ball_damage", nullable = false)
+    private Integer specialBallDamage = 3;
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
@@ -233,6 +240,22 @@ public class GameConfiguration implements Serializable {
     
     public void setPionPoints(Integer pionPoints) {
         this.pionPoints = pionPoints;
+    }
+
+    public Integer getSpecialBarMax() {
+        return specialBarMax;
+    }
+
+    public void setSpecialBarMax(Integer specialBarMax) {
+        this.specialBarMax = specialBarMax;
+    }
+
+    public Integer getSpecialBallDamage() {
+        return specialBallDamage;
+    }
+
+    public void setSpecialBallDamage(Integer specialBallDamage) {
+        this.specialBallDamage = specialBallDamage;
     }
     
     public Date getCreatedAt() {

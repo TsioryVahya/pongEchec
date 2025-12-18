@@ -183,7 +183,9 @@ class ConfigurationService:
             'fouPoints': config.get('fou_points', 30),
             'tourPoints': config.get('tour_points', 30),
             'chevalierPoints': config.get('chevalier_points', 30),
-            'pionPoints': config.get('pion_points', 10)
+            'pionPoints': config.get('pion_points', 10),
+            'specialBarMax': config.get('special_bar_max', 10),
+            'specialBallDamage': config.get('special_ball_damage', 3)
         }
     
     def _convert_from_server_format(self, server_config: Dict) -> Dict:
@@ -212,7 +214,9 @@ class ConfigurationService:
             'fou_points': server_config.get('fouPoints', 30),
             'tour_points': server_config.get('tourPoints', 30),
             'chevalier_points': server_config.get('chevalierPoints', 30),
-            'pion_points': server_config.get('pionPoints', 10)
+            'pion_points': server_config.get('pionPoints', 10),
+            'special_bar_max': server_config.get('specialBarMax', 10),
+            'special_ball_damage': server_config.get('specialBallDamage', 3)
         }
         
         # Ajouter les métadonnées si présentes

@@ -106,6 +106,12 @@ class Game:
         self.score_p1 = 0
         self.score_p2 = 0
         
+        # Special Ability Bar (Shared)
+        self.special_bar = 0
+        self.special_bar_max = settings.SPECIAL_BAR_MAX
+        self.special_ball_damage = settings.SPECIAL_BALL_DAMAGE
+        self.special_just_activated = False  # Flag to reset bar on first piece hit
+        
         # Pause state
         self.paused = False
         
@@ -124,6 +130,10 @@ class Game:
         settings.PIECE_VALUES['tour'] = config.get('tour_points', settings.PIECE_VALUES['tour'])
         settings.PIECE_VALUES['chevalier'] = config.get('chevalier_points', settings.PIECE_VALUES['chevalier'])
         settings.PIECE_VALUES['pion'] = config.get('pion_points', settings.PIECE_VALUES['pion'])
+        
+        # Apply special ability settings
+        self.special_bar_max = config.get('special_bar_max', settings.SPECIAL_BAR_MAX)
+        self.special_ball_damage = config.get('special_ball_damage', settings.SPECIAL_BALL_DAMAGE)
 
     def _setup_pieces(self):
         # Deprecated: kept for backward compatibility; Board now manages pieces
@@ -258,8 +268,16 @@ class Game:
         
         if self.serving_player == 1:
             self.ball.vy = abs(vy)  # Shoot down
+            if self.special_bar >= self.special_bar_max:
+                self.ball.is_special = True
+                self.ball.current_damage = self.special_ball_damage
+                self.special_just_activated = True
         else:
             self.ball.vy = -abs(vy)  # Shoot up
+            if self.special_bar >= self.special_bar_max:
+                self.ball.is_special = True
+                self.ball.current_damage = self.special_ball_damage
+                self.special_just_activated = True
             
         self.ball.vx = vx
 
@@ -285,23 +303,59 @@ class Game:
             return
 
         self.ball.move(self.board_bounds)  # Ball stays within board
+        
         # Paddles collision
+        # Check for special activation on paddle hit
+        prev_vy = self.ball.vy
         self.ball.collide_with_paddle(self.top_paddle)
+        if self.ball.vy != prev_vy: # Bounce occurred on Top Paddle (P1)
+            if self.special_bar >= self.special_bar_max:
+                self.ball.is_special = True
+                self.ball.current_damage = self.special_ball_damage
+                self.special_just_activated = True  # Mark for bar reset on first hit
+            # Else: keep current state (special or normal) - do not reset
+
+        prev_vy = self.ball.vy
         self.ball.collide_with_paddle(self.bottom_paddle)
+        if self.ball.vy != prev_vy: # Bounce occurred on Bottom Paddle (P2)
+            if self.special_bar >= self.special_bar_max:
+                self.ball.is_special = True
+                self.ball.current_damage = self.special_ball_damage
+                self.special_just_activated = True  # Mark for bar reset on first hit
+            # Else: keep current state (special or normal) - do not reset
+
+        # Auto-activate special if bar is full (even without paddle touch)
+        # Must be done BEFORE collision to apply special damage
+        if self.special_bar >= self.special_bar_max and not self.ball.is_special:
+            self.ball.is_special = True
+            self.ball.current_damage = self.special_ball_damage
+            self.special_just_activated = True
+
         # Pieces collision
         hit = self.ball.collide_with_pieces(self.board.pieces)
-        if hit and not hit.is_alive():
-            # Add score to opponent
-            points = settings.PIECE_VALUES.get(hit.type, 0)
-            if hit.owner == 1:
-                self.score_p2 += points
-            else:
-                self.score_p1 += points
+        if hit:
+            # If special was just activated, reset the bar now on first piece hit
+            if self.special_just_activated:
+                self.special_bar = 0
+                self.special_just_activated = False
+            
+            # Increment shared special bar (only if not special, or if special is active)
+            # On normal hit, increment. On special hit, don't increment (would refill too fast)
+            if not self.ball.is_special:
+                self.special_bar = min(self.special_bar + 1, self.special_bar_max)
                 
-            if hit.type == "roi":
-                # Winner is the opposite owner
-                self.winner_side = 1 if hit.owner == 2 else 2
-                self.game_over = True
+            if not hit.is_alive():
+                # Add score to opponent
+                points = settings.PIECE_VALUES.get(hit.type, 0)
+                if hit.owner == 1:
+                    self.score_p2 += points
+                else:
+                    self.score_p1 += points
+                    
+                if hit.type == "roi":
+                    # Winner is the opposite owner
+                    self.winner_side = 1 if hit.owner == 2 else 2
+                    self.game_over = True
 
     def get_game_state(self) -> Dict[str, Any]:
         """Get the current game state as a dictionary (for server to send to client)."""
@@ -380,6 +434,28 @@ class Game:
         p2_text = font.render(f"P2: {self.score_p2}", True, settings.RED)
         self.screen.blit(p2_text, (settings.SCREEN_WIDTH - p2_text.get_width() - 10, settings.NAVBAR_HEIGHT // 2 - p2_text.get_height() // 2))
         
+        # Special Bar (Shared)
+        bar_width = 200
+        bar_height = 10
+        center_x = settings.SCREEN_WIDTH // 2
+        
+        # Background
+        bar_bg = pygame.Rect(center_x - bar_width // 2, settings.NAVBAR_HEIGHT - 15, bar_width, bar_height)
+        pygame.draw.rect(self.screen, settings.GREY, bar_bg)
+        pygame.draw.rect(self.screen, settings.BLACK, bar_bg, 1) # Border
+        
+        if self.special_bar > 0:
+            fill_width = int((self.special_bar / self.special_bar_max) * bar_width)
+            bar_fill = pygame.Rect(center_x - bar_width // 2, settings.NAVBAR_HEIGHT - 15, fill_width, bar_height)
+            
+            # Color changes when full
+            color = settings.YELLOW if self.special_bar >= self.special_bar_max else (100, 100, 255)
+            pygame.draw.rect(self.screen, color, bar_fill)
+            
+            # Glow effect if full
+            if self.special_bar >= self.special_bar_max:
+                pygame.draw.rect(self.screen, settings.WHITE, bar_fill, 1)
+        
         # Buttons
         button_width = 100
         button_height = 30
@@ -440,6 +516,8 @@ class Game:
         self.is_serving = True
         self.serving_player = self.starting_player
         self.serve_angle = 0.0
+        self.special_bar = 0
+        self.special_just_activated = False
         
         # Reset pieces
         self.board = Board() # Re-create board to reset pieces
