@@ -228,7 +228,7 @@ def run_client_game(screen, clock, ip, port):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
+    screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), pygame.RESIZABLE)
     pygame.display.set_caption(settings.TITLE)
     clock = pygame.time.Clock()
     
