@@ -1,0 +1,5 @@
+<datasource jndi-name="java:jboss/datasources/PongEchecDS" pool-name="PongEchecDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
+        <connection-url>jdbc:postgresql://localhost:5432/pongechec_db</connection-url>
+        <driver>postgresql</driver>
+        <security user-name="postgres" password="admin"/>
+</datasource>
