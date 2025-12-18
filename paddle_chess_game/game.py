@@ -148,7 +148,7 @@ class Game:
     def handle_input(self):
         keys = pygame.key.get_pressed()
         # Top paddle (player 1): A = left, D = right
-        if keys[pygame.K_a]:
+        if keys[pygame.K_q]:
             self.top_paddle.move(left=True, bounds=self.paddle_bounds)
         if keys[pygame.K_d]:
             self.top_paddle.move(left=False, bounds=self.paddle_bounds)
@@ -164,7 +164,7 @@ class Game:
             
             # Player 1 Aiming (W/S)
             if self.serving_player == 1:
-                if keys[pygame.K_w]: # Aim Left (relative to shooting down) -> actually angle negative
+                if keys[pygame.K_z]: # Aim Left (relative to shooting down) -> actually angle negative
                     self.serve_angle = max(-45, self.serve_angle - aim_speed)
                 if keys[pygame.K_s]: # Aim Right -> angle positive
                     self.serve_angle = min(45, self.serve_angle + aim_speed)

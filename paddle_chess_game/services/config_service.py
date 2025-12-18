@@ -10,12 +10,7 @@ class ConfigurationService:
     """Service pour communiquer avec le backend Java EE via REST API."""
     
     def __init__(self, base_url: str = "http://localhost:8080/pongechec/api"):
-        """
-        Initialise le service de configuration.
-        
-        Args:
-            base_url: URL de base de l'API REST (par défaut: localhost:8080)
-        """
+       
         self.base_url = base_url
         self.endpoint = f"{base_url}/configurations"
     
