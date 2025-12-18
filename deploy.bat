@@ -6,7 +6,7 @@ echo.
 
 REM Configuration des chemins
 REM ATTENTION: Modifiez ce chemin selon votre installation WildFly
-set WILDFLY_HOME=G:\ITU\S5\PROG\wildfly\wildfly-37.0.1.Final\
+set WILDFLY_HOME=D:\wildfly-37.0.1.Final\
 set WILDFLY_DEPLOYMENTS=%WILDFLY_HOME%\standalone\deployments
 set PROJECT_ROOT=%~dp0
 set BACKEND_MODULE=%PROJECT_ROOT%backend
