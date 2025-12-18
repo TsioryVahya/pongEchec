@@ -1,3 +1,4 @@
+-- Active: 1766037094748@@127.0.0.1@5432@pongechec_db
 -- Script SQL pour initialiser la base de données PongEchec
 -- PostgreSQL
 
@@ -14,14 +15,12 @@ DROP TABLE IF EXISTS game_configurations;
 -- Créer la table game_configurations
 CREATE TABLE game_configurations (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    
+    name VARCHAR(100) NOT NULL, 
     -- Paramètres généraux
     ball_speed INTEGER NOT NULL DEFAULT 3,
     ball_damage INTEGER NOT NULL DEFAULT 1,
     board_width INTEGER NOT NULL DEFAULT 8,
     starting_player INTEGER NOT NULL DEFAULT 1,
-    
     -- Vies des pièces
     roi_lives INTEGER NOT NULL DEFAULT 3,
     reine_lives INTEGER NOT NULL DEFAULT 2,
@@ -29,15 +28,13 @@ CREATE TABLE game_configurations (
     tour_lives INTEGER NOT NULL DEFAULT 2,
     chevalier_lives INTEGER NOT NULL DEFAULT 2,
     pion_lives INTEGER NOT NULL DEFAULT 1,
-    
     -- Points des pièces
     roi_points INTEGER NOT NULL DEFAULT 100,
     reine_points INTEGER NOT NULL DEFAULT 50,
     fou_points INTEGER NOT NULL DEFAULT 30,
     tour_points INTEGER NOT NULL DEFAULT 30,
     chevalier_points INTEGER NOT NULL DEFAULT 30,
-    pion_points INTEGER NOT NULL DEFAULT 10,
-    
+    pion_points INTEGER NOT NULL DEFAULT 10, 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
