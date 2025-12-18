@@ -19,8 +19,8 @@ BLUE = (66, 135, 245)
 GREEN = (60, 179, 113)
 YELLOW = (255, 215, 0)
 GREY = (200, 200, 200)
-BEIGE = (245, 245, 220)
-BROWN = (139, 69, 19)
+BEIGE = (240, 240, 240)  # Light squares (almost white)
+BROWN = (60, 60, 60)     # Dark squares (dark gray/black)
 
 # Paddle (now horizontal to protect chess pieces from top/bottom)
 PADDLE_WIDTH = 100  # Wide horizontal paddle
