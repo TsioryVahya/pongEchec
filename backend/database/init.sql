@@ -2,7 +2,7 @@
 -- PostgreSQL
 
 -- Créer la base de données (exécuter en tant que superuser)
--- CREATE DATABASE pongechec_db;
+CREATE DATABASE pongechec_db;
 -- GRANT ALL PRIVILEGES ON DATABASE pongechec_db TO votre_user;
 
 -- Se connecter à la base de données pongechec_db
