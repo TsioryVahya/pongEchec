@@ -28,13 +28,16 @@ CREATE TABLE game_configurations (
     tour_lives INTEGER NOT NULL DEFAULT 2,
     chevalier_lives INTEGER NOT NULL DEFAULT 2,
     pion_lives INTEGER NOT NULL DEFAULT 1,
-    -- Points des pièces
+     -- Points des pièces
     roi_points INTEGER NOT NULL DEFAULT 100,
     reine_points INTEGER NOT NULL DEFAULT 50,
     fou_points INTEGER NOT NULL DEFAULT 30,
     tour_points INTEGER NOT NULL DEFAULT 30,
     chevalier_points INTEGER NOT NULL DEFAULT 30,
-    pion_points INTEGER NOT NULL DEFAULT 10, 
+    pion_points INTEGER NOT NULL DEFAULT 10,
+    -- Capacités Spéciales
+    special_bar_max INTEGER NOT NULL DEFAULT 10,
+    special_ball_damage INTEGER NOT NULL DEFAULT 3,   
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -45,9 +48,10 @@ CREATE INDEX idx_config_name ON game_configurations(name);
 INSERT INTO game_configurations (
     name, ball_speed, ball_damage, board_width, starting_player,
     roi_lives, reine_lives, fou_lives, tour_lives, chevalier_lives, pion_lives,
-    roi_points, reine_points, fou_points, tour_points, chevalier_points, pion_points
+    roi_points, reine_points, fou_points, tour_points, chevalier_points, pion_points,
+    special_bar_max, special_ball_damage
 ) VALUES 
-    ('Configuration Standard', 3, 1, 8, 1, 3, 2, 2, 2, 2, 1, 100, 50, 30, 30, 30, 10);
+    ('Configuration Standard', 3, 1, 8, 1, 3, 2, 2, 2, 2, 1, 100, 50, 30, 30, 30, 10, 10, 3);
 
 -- Afficher les configurations
 SELECT * FROM game_configurations;
